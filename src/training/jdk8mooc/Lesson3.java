@@ -70,10 +70,8 @@ public class Lesson3
      * as much as it needs to, since for every word a, b it should be the case
      * that lev(a,b) == lev(b,a) i.e., Levenshtein distance is commutative.
      *
-     * @param wordList
-     *            The subset of words whose distances to compute
-     * @param parallel
-     *            Whether to run in parallel
+     * @param wordList The subset of words whose distances to compute
+     * @param parallel Whether to run in parallel
      * @return Matrix of Levenshtein distances
      */
     static int[][] computeLevenshtein(List<String> wordList, boolean parallel)
@@ -81,7 +79,38 @@ public class Lesson3
         final int LIST_SIZE = wordList.size();
         int[][] distances = new int[LIST_SIZE][LIST_SIZE];
 
-        // YOUR CODE HERE
+        Stream<String> wordStreamA = parallel ? wordList.parallelStream() : wordList.stream();
+//        Stream<String> wordStreamB = (parallel ? wordList.parallelStream() : wordList.stream());
+        
+//        distances = 
+////                (int[][])
+////        Object[] objs =
+//                wordStreamA
+//                    .map((String a) -> {
+//                        return (parallel ? wordList.parallelStream() : wordList.stream())
+//                            .mapToInt((String b) -> Levenshtein.lev(a, b))
+//                            .toArray();
+//                    })
+//                    .collect(Collectors.toList())
+//                    .toArray();
+        
+//        int[] ints = wordStreamA
+//            .mapToInt((String a) -> Levenshtein.lev(a, "testword"))
+//            .toArray();
+            
+        IntStream is = IntStream.range(0, LIST_SIZE);
+        if (parallel)
+            is.parallel();
+        
+        is
+            .forEach((int i) -> {
+                String a = wordList.get(i);
+                distances[i] = (parallel ? wordList.parallelStream() : wordList.stream())
+                            .mapToInt((String b) -> Levenshtein.lev(a, b))
+                            .toArray();
+            });
+//            .collect(Collectors.toList())
+//            .toArray();
 
         return distances;
     }
@@ -89,10 +118,8 @@ public class Lesson3
     /**
      * Process a list of random strings and return a modified list
      * 
-     * @param wordList
-     *            The subset of words whose distances to compute
-     * @param parallel
-     *            Whether to run in parallel
+     * @param wordList The subset of words whose distances to compute
+     * @param parallel Whether to run in parallel
      * @return The list processed in whatever way you want
      */
     static List<String> processWords(List<String> wordList, boolean parallel)
@@ -105,10 +132,8 @@ public class Lesson3
     /**
      * Main entry point for application
      *
-     * @param args
-     *            the command line arguments
-     * @throws IOException
-     *             If word file cannot be read
+     * @param args the command line arguments
+     * @throws IOException If word file cannot be read
      */
     public static void main(String[] args) throws IOException
     {
@@ -120,5 +145,7 @@ public class Lesson3
 
         // measure("Sequential", () -> processWords(wordList, false));
         // measure("Parallel", () -> processWords(wordList, true));
+        
+//        wordList.stream().forEach(word -> System.out.println(word));
     }
 }
